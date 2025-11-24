@@ -29,7 +29,7 @@ class L1Penalty(object):
         Returns:
             Value of penalty term.
         """
-        raise NotImplementedError
+        return self.coefficient * np.sum(np.abs(parameter))
 
     def grad(self, parameter):
         """Calculate the penalty gradient with respect to the parameter.
@@ -41,7 +41,8 @@ class L1Penalty(object):
             Value of penalty gradient with respect to parameter. This
             should be an array of the same shape as the parameter.
         """
-        raise NotImplementedError
+        # Gradient of |x| is sign(x), with 0 at x = 0
+        return self.coefficient * np.sign(parameter)
 
     def __repr__(self):
         return 'L1Penalty({0})'.format(self.coefficient)
@@ -72,7 +73,8 @@ class L2Penalty(object):
         Returns:
             Value of penalty term.
         """
-        raise NotImplementedError
+        # L2 penalty: λ * 0.5 * ||w||^2
+        return 0.5 * self.coefficient * np.sum(parameter ** 2)
 
     def grad(self, parameter):
         """Calculate the penalty gradient with respect to the parameter.
@@ -84,7 +86,8 @@ class L2Penalty(object):
             Value of penalty gradient with respect to parameter. This
             should be an array of the same shape as the parameter.
         """
-        raise NotImplementedError
+        # Gradient of 0.5 * λ * ||w||^2 is λ * w
+        return self.coefficient * parameter
 
     def __repr__(self):
         return 'L2Penalty({0})'.format(self.coefficient)
