@@ -96,14 +96,16 @@ class L1L2MixPenalty(object):
     """L1 & L2 mix penalty.
     """
 
-    def __init__(self, coefficient):
+    def __init__(self, coefficient, alpha):
         """Create a new L1 & L2 mix penalty object.
 
         Args:
             coefficient: Positive constant to scale penalty term by.
         """
         assert coefficient > 0., 'Penalty coefficient must be positive.'
+        assert 0 <= alpha <= 1., 'Alpha must be in [0, 1].'
         self.coefficient = coefficient
+        self.alpha = alpha
 
     def __call__(self, parameter):
         """Calculate L1 & L2 mix penalty value for a parameter.
@@ -114,7 +116,9 @@ class L1L2MixPenalty(object):
         Returns:
             Value of penalty term.
         """
-        raise NotImplementedError
+        l1_term = np.sum(np.abs(parameter))
+        l2_term = 0.5 * np.sum(parameter ** 2)
+        return self.coefficient * (self.alpha * l1_term + (1 - self.alpha) * l2_term)
 
     def grad(self, parameter):
         """Calculate the penalty gradient with respect to the parameter.
@@ -126,7 +130,9 @@ class L1L2MixPenalty(object):
             Value of penalty gradient with respect to parameter. This
             should be an array of the same shape as the parameter.
         """
-        raise NotImplementedError
+        l1_grad = np.sign(parameter)
+        l2_grad = parameter
+        return self.coefficient * (self.alpha * l1_grad + (1 - self.alpha) * l2_grad)
 
     def __repr__(self):
-        return 'L1L2MixPenalty({0})'.format(self.coefficient)
+        return 'L1L2MixPenalty(coefficient={0}, alpha={1})'.format(self.coefficient, self.alpha)
